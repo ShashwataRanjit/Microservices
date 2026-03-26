@@ -11,31 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 FROM golang:1.23.4-alpine AS builder
-ARG TARGETOS
-ARG TARGETARCH
+
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
+
 WORKDIR /src
 
-# restore dependencies
 COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
 
-# Skaffold passes in debug-oriented compiler flags
-ARG SKAFFOLD_GO_GCFLAGS
-RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    go build -o checkoutservice .
 
 FROM scratch
 
-WORKDIR /src
-COPY --from=builder /checkoutservice /src/checkoutservice
-
-# Definition of this variable is used by 'skaffold debug' to identify a golang binary.
-# Default behavior - a failure prints a stack trace for the current goroutine.
-# See https://golang.org/pkg/runtime/
-ENV GOTRACEBACK=single
+WORKDIR /app
+COPY --from=builder /src/checkoutservice .
 
 EXPOSE 5050
-ENTRYPOINT ["/src/checkoutservice"]
+
+ENTRYPOINT ["./checkoutservice"]
