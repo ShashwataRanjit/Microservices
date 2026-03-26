@@ -1,6 +1,4 @@
-#FROM node:18-alpine AS builder
-
-# Required for some native modules
+FROM node:18-alpine AS builder
 RUN apk add --no-cache python3 make g++
 
 WORKDIR /usr/src/app
