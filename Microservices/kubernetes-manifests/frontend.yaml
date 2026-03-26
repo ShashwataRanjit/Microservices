@@ -46,7 +46,7 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: true
-          image: 329599634288.dkr.ecr.ap-northeast-1.amazonaws.com/frontend
+          image: 277814186008.dkr.ecr.ap-northeast-1.amazonaws.com/frontend
           ports:
           - containerPort: 8080
           readinessProbe:
